@@ -1,0 +1,10 @@
+- name: Deploy index.html to web server
+  hosts: webservers
+  connection: local
+  become: yes
+  tasks:
+    - name: Copy index.html to /var/www/html/
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        mode: '0644'

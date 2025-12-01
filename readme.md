@@ -106,33 +106,59 @@ pipeline {
 
 ---
 
-## 4. Ansible Playbook for `index.html`
+## 4. Ansible Playbook for `index.html` (WSL Ubuntu & Local)
 
-Create a file named `deploy.yml`:
+### Using WSL Ubuntu (Recommended for Windows users)
 
-```yaml
-# filepath: deploy.yml
-- name: Deploy index.html to web server
-  hosts: webservers
-  become: yes
-  tasks:
-    - name: Copy index.html to /var/www/html/
-      copy:
-        src: index.html
-        dest: /var/www/html/index.html
-        mode: '0644'
-```
+1. **Install WSL and Ubuntu:**  
+   Follow [Microsoft’s guide](https://learn.microsoft.com/en-us/windows/wsl/install) to install WSL and Ubuntu.
 
-**Inventory example (`hosts`):**
-```ini
-[webservers]
-your_web_server_ip_or_hostname
-```
+2. **Install Ansible in Ubuntu:**
+   ```sh
+   sudo apt update
+   sudo apt install ansible
+   ```
 
-**Run the playbook:**
-```sh
-ansible-playbook -i hosts deploy.yml
-```
+3. **Prepare your files:**  
+   Place `index.html`, `deploy.yml`, and `hosts` in your project directory.
+
+4. **Inventory file (`hosts`):**
+   ```ini
+   [webservers]
+   localhost
+   ```
+
+5. **Playbook (`deploy.yml`):**
+   ```yaml
+   # filepath: deploy.yml
+   - name: Deploy index.html to web server
+     hosts: webservers
+     connection: local
+     become: yes
+     tasks:
+       - name: Ensure /var/www/html exists
+         file:
+           path: /var/www/html
+           state: directory
+           mode: '0755'
+       - name: Copy index.html to /var/www/html/
+         copy:
+           src: index.html
+           dest: /var/www/html/index.html
+           mode: '0644'
+   ```
+
+6. **Run the playbook:**
+   ```sh
+   ansible-playbook -i hosts deploy.yml
+   ```
+
+---
+
+### Using Local Ubuntu (Native Linux)
+
+Follow the same steps as above.  
+If you want to deploy to a remote server, replace `localhost` in the `hosts` file with the server’s IP or hostname and ensure SSH access.
 
 ---
 
@@ -141,7 +167,7 @@ ansible-playbook -i hosts deploy.yml
 - `index.html`: Contact form with name, email, mobile, subject.
 - Pushed to GitHub following standard git commands.
 - Jenkins pipeline (`Jenkinsfile`) with `pollSCM` for auto-build.
-- Ansible playbook (`deploy.yml`) to deploy `index.html` to web server.
+- Ansible playbook (`deploy.yml`) to deploy `index.html` to web server using WSL Ubuntu or local Ubuntu.
 
 ---
 
@@ -150,3 +176,4 @@ ansible-playbook -i hosts deploy.yml
 - [GitHub Docs](https://docs.github.com/)
 - [Jenkins Pipeline](https://www.jenkins.io/doc/book/pipeline/)
 - [Ansible Playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
+- [WSL Installation Guide](https://learn.microsoft.com/en-us/windows/wsl/install)
